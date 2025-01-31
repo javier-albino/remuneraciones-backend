@@ -1,54 +1,13 @@
-name: CI/CD para Remuneraciones Backend
-
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: 📥 Checkout del código
-        uses: actions/checkout@v3
-
-      - name: 🔧 Configurar Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-          cache: 'npm'
-
-      - name: 📦 Instalar dependencias
-        run: npm install
-
-      - name: 🔎 Ejecutar Linter
-        run: npm run lint
-
-      - name: 🧪 Ejecutar Tests
-        run: npm run test
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: 📥 Checkout del código
-        uses: actions/checkout@v3
-
-      - name: 🐳 Iniciar Docker y construir imagen
-        run: |
-          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
-          docker build -t javieralbino/remuneraciones-backend .
-          docker tag javieralbino/remuneraciones-backend:latest javieralbino/remuneraciones-backend:latest
-          docker push javieralbino/remuneraciones-backend:latest
-
-      - name: 🚀 Desplegar en servidor
-        run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
-          docker pull javieralbino/remuneraciones-backend:latest
-          docker stop remuneraciones-backend || true
-          docker rm remuneraciones-backend || true
-          docker run -d -p 3000:3000 --name remuneraciones-backend javieralbino/remuneraciones-backend:latest
-          EOF
+services:
+  - type: web
+    name: remuneraciones-backend
+    runtime: node
+    repo: https://github.com/javier-albino/remuneraciones-backend
+    branch: main
+    buildCommand: npm install
+    startCommand: npm run start:prod
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000

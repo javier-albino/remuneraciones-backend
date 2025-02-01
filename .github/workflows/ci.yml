@@ -11,9 +11,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
-
-      - name: Configurar Node.js
+      - uses: actions/checkout@v3 #clona el repositorio
+      - name: Configurar Node.js  #configura la versión de node
         uses: actions/setup-node@v3
         with:
           node-version: 18 # O tu versión preferida

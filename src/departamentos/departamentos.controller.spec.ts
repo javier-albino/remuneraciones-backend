@@ -1,32 +1,35 @@
+// src/departamentos/departamentos.service.spec.ts
+
 import { Test, TestingModule } from '@nestjs/testing';
-import { DepartamentosController } from './departamentos.controller';
 import { DepartamentosService } from './departamentos.service';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { Departamento } from '../entities/departamentos';
 
-describe('DepartamentosController', () => {
-  let controller: DepartamentosController;
+describe('DepartamentosService', () => {
+  let service: DepartamentosService;
 
-  // Creamos un mock del servicio, definiendo los métodos que el controlador utiliza.
-  const mockDepartamentosService = {
-    findAll: jest.fn().mockResolvedValue([]),
-    create: jest.fn().mockResolvedValue({}),
-    delete: jest.fn().mockResolvedValue(undefined),
+  // Creamos un mock del repositorio de Departamento
+  const mockDepartamentoRepository = {
+    find: jest.fn(),
+    save: jest.fn(),
+    delete: jest.fn(),
   };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      controllers: [DepartamentosController],
       providers: [
+        DepartamentosService,
         {
-          provide: DepartamentosService,
-          useValue: mockDepartamentosService,
+          provide: getRepositoryToken(Departamento),
+          useValue: mockDepartamentoRepository,
         },
       ],
     }).compile();
 
-     controller = module.get<DepartamentosController>(DepartamentosController);
+    service = module.get<DepartamentosService>(DepartamentosService);
   });
 
   it('should be defined', () => {
-    expect(controller).toBeDefined();
+    expect(service).toBeDefined();
   });
 });

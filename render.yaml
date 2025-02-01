@@ -11,5 +11,5 @@ services:
         value: production
       - key: PORT
         value: 3000
-      - key: DATABASE_URL
-        value: mysql://root:CmCHxizzHAKyDhhseYwUkBcsiGUQbKRU@viaduct.proxy.rlwy.net:20374/remuneraciones
+        - key: DATABASE_URL
+        sync: false 

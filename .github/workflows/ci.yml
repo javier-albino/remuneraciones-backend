@@ -1,0 +1,28 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18 # O tu versión preferida
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Construir aplicación
+        run: npm run build # O tu comando de compilación
+
+      - name: Ejecutar pruebas
+        run: npm test # O tu comando de prueba

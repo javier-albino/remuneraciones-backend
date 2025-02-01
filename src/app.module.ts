@@ -4,18 +4,16 @@ import { RolesModule } from './roles/roles.module';
 import { DepartamentosModule } from './departamentos/departamentos.module';
 import { UsuariosModule } from './usuarios/usuarios.module';
 import { RemuneracionesModule } from './remuneraciones/remuneraciones.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot(), // Cargar variables de entorno
     TypeOrmModule.forRoot({
       type: 'mysql',
-      host: '127.0.0.1',
-      port: 3306,
-      username: 'root',
-      password: '', // Sin contraseña
-      database: 'remuneraciones',
+      url: process.env.DATABASE_URL, // Usar la variable de entorno en Render
       autoLoadEntities: true,
-      synchronize: true,
+      synchronize: process.env.NODE_ENV !== 'production', // ❗ Solo en desarrollo
     }),
     RolesModule,
     DepartamentosModule,

@@ -23,7 +23,7 @@ describe('DepartamentosController', () => {
       ],
     }).compile();
 
-    controller = module.get<DepartamentosController>(DepartamentosController);
+     controller = module.get<DepartamentosController>(DepartamentosController);
   });
 
   it('should be defined', () => {

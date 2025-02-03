@@ -1,10 +1,7 @@
-name: CI/CD con EC2
+name: CI/CD Deploy to EC2
 
 on:
   push:
-    branches:
-      - main
-  pull_request:
     branches:
       - main
 
@@ -19,32 +16,21 @@ jobs:
       - name: Configurar Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 18 # Ajusta según tu versión preferida
+          node-version: 18
 
       - name: Instalar dependencias
         run: npm ci
 
-      - name: Construir aplicación
-        run: npm run build
-
-      - name: Copiar archivos a EC2
+      - name: Conectarse a EC2 y desplegar
         env:
-          PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
+          PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
           HOST: ${{ secrets.EC2_HOST }}
-          USER: ubuntu
         run: |
           echo "$PRIVATE_KEY" > private_key.pem
           chmod 600 private_key.pem
-          rsync -avz -e "ssh -i private_key.pem -o StrictHostKeyChecking=no" ./ ubuntu@$HOST:/home/ubuntu/app
-
-      - name: Instalar dependencias en EC2 y reiniciar aplicación
-        env:
-          PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
-          HOST: ${{ secrets.EC2_HOST }}
-          USER: ubuntu
-        run: |
           ssh -i private_key.pem -o StrictHostKeyChecking=no ubuntu@$HOST << 'EOF'
-          cd /home/ubuntu/app
-          npm install
-          pm2 restart all || pm2 start npm -- start
+            cd /home/ubuntu/app
+            npm install
+            pm2 restart all || pm2 start npm -- start
+            pm2 save
           EOF

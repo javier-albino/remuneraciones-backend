@@ -1,27 +1,50 @@
-name: CI
+name: CI/CD con EC2
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
   pull_request:
-    branches: [main]
+    branches:
+      - main
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3 #clona el repositorio
-      - name: Configurar Node.js  #configura la versión de node
+      - name: Clonar el repositorio
+        uses: actions/checkout@v3
+
+      - name: Configurar Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 18 # O tu versión preferida
+          node-version: 18 # Ajusta según tu versión preferida
 
       - name: Instalar dependencias
         run: npm ci
 
       - name: Construir aplicación
-        run: npm run build # O tu comando de compilación
+        run: npm run build
 
-      - name: Ejecutar pruebas
-        run: npm test # O tu comando de prueba
+      - name: Copiar archivos a EC2
+        env:
+          PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
+          HOST: ${{ secrets.EC2_HOST }}
+          USER: ubuntu
+        run: |
+          echo "$PRIVATE_KEY" > private_key.pem
+          chmod 600 private_key.pem
+          rsync -avz -e "ssh -i private_key.pem -o StrictHostKeyChecking=no" ./ ubuntu@$HOST:/home/ubuntu/app
+
+      - name: Instalar dependencias en EC2 y reiniciar aplicación
+        env:
+          PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
+          HOST: ${{ secrets.EC2_HOST }}
+          USER: ubuntu
+        run: |
+          ssh -i private_key.pem -o StrictHostKeyChecking=no ubuntu@$HOST << 'EOF'
+          cd /home/ubuntu/app
+          npm install
+          pm2 restart all || pm2 start npm -- start
+          EOF

@@ -25,12 +25,28 @@ jobs:
         env:
           PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
           HOST: ${{ secrets.EC2_HOST }}
+          USER: ubuntu
         run: |
-          echo "$PRIVATE_KEY" > private_key.pem
-          chmod 600 private_key.pem
-          ssh -i private_key.pem -o StrictHostKeyChecking=no ubuntu@$HOST << 'EOF'
-            cd /home/ubuntu/app
+          # Agregar clave al agente SSH
+          eval "$(ssh-agent -s)"
+          ssh-add - <<< "$PRIVATE_KEY"
+
+          # Conectarse a EC2 y ejecutar comandos
+          ssh -o StrictHostKeyChecking=no $USER@$HOST << 'EOF'
+            set -e  # Detener ejecución en caso de error
+            echo "🚀 Conectado a EC2. Desplegando..."
+
+            # Navegar al directorio de la aplicación
+            cd /home/ubuntu/app || exit 1
+
+            # Asegurar que Node.js y pm2 están instalados
+            which node || curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash - && sudo apt-get install -y nodejs
+            which pm2 || npm install -g pm2
+
+            # Instalar dependencias y reiniciar aplicación
             npm install
             pm2 restart all || pm2 start npm -- start
             pm2 save
+
+            echo "✅ Despliegue completado exitosamente"
           EOF

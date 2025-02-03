@@ -15,6 +15,7 @@ describe('DepartamentosService', () => {
   // En un test unitario no queremos conectarnos a una base de datos real,
   // por lo que definimos los métodos que el servicio pueda llamar (find, save, delete, etc.).
   const mockDepartamentoRepository = {
+    
     find: jest.fn(),
     save: jest.fn(),
     delete: jest.fn(),

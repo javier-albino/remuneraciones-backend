@@ -19,51 +19,51 @@ jobs:
           HOST: ${{ secrets.EC2_HOST }}
           USER: ubuntu
         run: |
-          # Crear archivo temporal para la clave privada con formato correcto
-          echo "$PRIVATE_KEY" | base64 --decode > private_key.pem
+          # 🔹 Crear archivo de clave privada sin Base64 (corregido)
+          echo "$PRIVATE_KEY" > private_key.pem
           chmod 600 private_key.pem
 
-          # Conectarse a EC2 y ejecutar comandos de despliegue
+          # 🔹 Conectarse a EC2 y ejecutar comandos de despliegue
           ssh -o StrictHostKeyChecking=no -i private_key.pem $USER@$HOST << 'EOF'
             set -e  # Detener ejecución en caso de error
             echo "🚀 Conectado a EC2. Desplegando..."
 
-            # Crear carpeta del proyecto si no existe
+            # 🔹 Crear carpeta del proyecto si no existe
             mkdir -p /home/ubuntu/app
             cd /home/ubuntu/app
 
-            # Instalar Node.js y pm2 si no están instalados
+            # 🔹 Instalar Node.js y pm2 si no están instalados
             which node || curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash - && sudo apt-get install -y nodejs
             which pm2 || npm install -g pm2
 
-            # Configurar permisos correctos en git
+            # 🔹 Configurar permisos correctos en git
             git config --global --add safe.directory /home/ubuntu/app
 
-            # Clonar el repo si no existe
+            # 🔹 Clonar el repo si no existe
             if [ ! -d ".git" ]; then
               git clone https://github.com/javier-albino/remuneraciones-backend.git .
             fi
 
-            # Obtener la última versión del código
+            # 🔹 Obtener la última versión del código
             git fetch origin main
             git reset --hard origin/main
 
-            # Instalar dependencias con npm ci (más seguro que npm install)
+            # 🔹 Instalar dependencias con npm ci (más seguro que npm install)
             npm ci
 
-            # Construir la aplicación si es necesario
+            # 🔹 Construir la aplicación si es necesario
             if [ -f package.json ] && grep -q '"build":' package.json; then
               npm run build
             else
               echo "⚠️ No build step found, skipping..."
             fi
 
-            # Reiniciar la aplicación con PM2
+            # 🔹 Reiniciar la aplicación con PM2
             pm2 restart all || pm2 start npm -- start
             pm2 save
 
             echo "✅ Despliegue completado exitosamente"
           EOF
 
-          # Eliminar la clave privada por seguridad
+          # 🔹 Eliminar la clave privada por seguridad
           rm -f private_key.pem

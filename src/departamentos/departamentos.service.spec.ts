@@ -8,6 +8,7 @@ import { DepartamentosService } from './departamentos.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Departamento } from '../entities/departamentos';
 
+
 describe('DepartamentosService', () => {
   let service: DepartamentosService;
 

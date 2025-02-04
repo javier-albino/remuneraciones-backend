@@ -27,8 +27,8 @@ jobs:
           HOST: ${{ secrets.EC2_HOST }}
           USER: ubuntu
         run: |
-          # Crear archivo temporal para la clave privada
-          echo "$PRIVATE_KEY" > private_key.pem
+          # Crear archivo temporal para la clave privada con formato correcto
+          echo "$PRIVATE_KEY" | tr -d '\r' > private_key.pem
           chmod 600 private_key.pem
 
           # Agregar la clave al agente SSH
@@ -36,7 +36,7 @@ jobs:
           ssh-add private_key.pem
 
           # Conectarse a EC2 y ejecutar comandos
-          ssh -o StrictHostKeyChecking=no $USER@$HOST << 'EOF'
+          ssh -o StrictHostKeyChecking=no -i private_key.pem $USER@$HOST << 'EOF'
             set -e  # Detener ejecución en caso de error
             echo "🚀 Conectado a EC2. Desplegando..."
 

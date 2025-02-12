@@ -19,7 +19,7 @@ jobs:
           HOST: ${{ secrets.EC2_HOST }}
           USER: ubuntu
         run: |
-          # 🔹 Crear archivo de clave privada sin Base64 (corregido)
+          # 🔹 Crear archivo de clave privada sin Base64
           echo "$PRIVATE_KEY" > private_key.pem
           chmod 600 private_key.pem
 
@@ -29,32 +29,38 @@ jobs:
             echo "🚀 Conectado a EC2. Desplegando..."
 
             # 🔹 Crear carpeta del proyecto si no existe
-            mkdir -p /home/ubuntu/app
+            sudo mkdir -p /home/ubuntu/app
             cd /home/ubuntu/app
 
             # 🔹 Instalar Node.js si no está instalado
-            which node || curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash - && sudo apt-get install -y nodejs
+            if ! command -v node &> /dev/null; then
+              curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+              sudo apt-get install -y nodejs
+            fi
 
-            # 🔹 Instalar pm2 con permisos adecuados
-            which pm2 || sudo npm install -g pm2
+            # 🔹 Instalar PM2 si no está instalado
+            if ! command -v pm2 &> /dev/null; then
+              sudo npm install -g pm2
+            fi
 
             # 🔹 Configurar permisos correctos en git
             git config --global --add safe.directory /home/ubuntu/app
 
-            # 🔹 Clonar el repo si no existe
-            if [ ! -d ".git" ]; then
+            # 🔹 Clonar o actualizar el repositorio
+            if [ -d ".git" ]; then
+              echo "🔄 Repositorio ya clonado, actualizando..."
+              git reset --hard
+              git pull origin main
+            else
+              echo "📥 Clonando repositorio..."
               git clone https://github.com/javier-albino/remuneraciones-backend.git .
             fi
-
-            # 🔹 Obtener la última versión del código
-            git fetch origin main
-            git reset --hard origin/main
 
             # 🔹 Instalar dependencias con npm ci
             npm ci
 
-            # 🔹 Construir la aplicación si es necesario
-            if [ -f package.json ] && grep -q '"build":' package.json; then
+            # 🔹 Construir la aplicación si hay un script de build
+            if grep -q '"build":' package.json; then
               npm run build
             else
               echo "⚠️ No build step found, skipping..."

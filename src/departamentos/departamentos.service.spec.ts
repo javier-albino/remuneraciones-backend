@@ -25,6 +25,7 @@ describe('DepartamentosService', () => {
     delete: jest.fn(),
   };
 
+  
   beforeEach(async () => {
     // Creamos un TestingModule para el test.
     // Aquí se declara que el proveedor DepartamentosService se usará,

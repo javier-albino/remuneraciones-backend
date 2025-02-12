@@ -19,52 +19,46 @@ jobs:
           HOST: ${{ secrets.EC2_HOST }}
           USER: ubuntu
         run: |
-          # Crear archivo de clave privada de forma segura
+          # 🔹 Crear archivo de clave privada de forma segura
           echo "$PRIVATE_KEY" > private_key.pem
           chmod 600 private_key.pem
 
-          # Conectarse a EC2 y ejecutar comandos de despliegue
+          # 🔹 Conectarse a EC2 y ejecutar comandos de despliegue
           ssh -o StrictHostKeyChecking=no -i private_key.pem $USER@$HOST << 'EOF'
-          set -e  # Detener ejecución en caso de error
-          echo "🚀 Conectado a EC2. Desplegando..."
+            set -e  # Detener ejecución en caso de error
+            echo "🚀 Conectado a EC2. Desplegando..."
 
-          # Crear carpeta del proyecto si no existe
-          mkdir -p /home/ubuntu/app
-          cd /home/ubuntu/app
+            # 🔹 Crear carpeta si no existe
+            sudo mkdir -p /home/ubuntu/app
+            cd /home/ubuntu/app
 
-          # Asegurar que Git esté correctamente configurado
-          git config --global --add safe.directory /home/ubuntu/app
+            # 🔹 Si el repositorio ya existe, actualizarlo; si no, clonarlo
+            if [ -d ".git" ]; then
+              echo "🔄 Repositorio ya clonado, actualizando..."
+              git reset --hard
+              git pull origin main --rebase
+            else
+              echo "📥 Clonando repositorio..."
+              sudo rm -rf *  # Asegurar que no haya archivos sueltos
+              git clone https://github.com/javier-albino/remuneraciones-backend.git .
+            fi
 
-          # Si el repositorio ya existe, actualizarlo; si no, clonarlo
-          if [ -d ".git" ]; then
-            echo "🔄 Repositorio ya clonado, actualizando..."
-            git reset --hard
-            git pull origin main --rebase
-          else
-            echo "📥 Clonando repositorio..."
-            git clone https://github.com/javier-albino/remuneraciones-backend.git .
-          fi
-
-          # Instalar dependencias con npm ci
-          if [ -f package-lock.json ]; then
+            # 🔹 Instalar dependencias con npm ci
             npm ci
-          else
-            npm install
-          fi
 
-          # Construir la aplicación si hay un script de build
-          if grep -q '"build":' package.json; then
-            npm run build
-          else
-            echo "⚠️ No build step found, skipping..."
-          fi
+            # 🔹 Construir la aplicación si hay un script de build
+            if grep -q '"build":' package.json; then
+              npm run build
+            else
+              echo "⚠️ No build step found, skipping..."
+            fi
 
-          # Reiniciar la aplicación con PM2
-          pm2 restart all || pm2 start npm -- start
-          pm2 save
+            # 🔹 Reiniciar la aplicación con PM2
+            pm2 restart all || pm2 start npm -- start
+            pm2 save
 
-          echo "✅ Despliegue completado exitosamente"
+            echo "✅ Despliegue completado exitosamente"
           EOF
 
-          # Eliminar la clave privada por seguridad
+          # 🔹 Eliminar la clave privada por seguridad
           rm -f private_key.pem

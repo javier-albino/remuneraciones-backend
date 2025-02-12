@@ -35,6 +35,7 @@ describe('DepartamentosService', () => {
         DepartamentosService,
         {
           provide: getRepositoryToken(Departamento),
+          
           useValue: mockDepartamentoRepository,
         },
       ],

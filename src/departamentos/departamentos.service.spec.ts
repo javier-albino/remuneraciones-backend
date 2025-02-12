@@ -30,6 +30,7 @@ describe('DepartamentosService', () => {
     // Aquí se declara que el proveedor DepartamentosService se usará,
     // y que para la inyección de dependencia del repositorio de Departamento,
     // se utilizará el objeto mockDepartamentoRepository.
+    
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         DepartamentosService,

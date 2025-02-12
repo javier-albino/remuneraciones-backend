@@ -15,6 +15,7 @@ import { ConfigModule } from '@nestjs/config';
       autoLoadEntities: true,
       synchronize: process.env.NODE_ENV !== 'production', // ❗ Solo en desarrollo
     }),
+    
     RolesModule,
     DepartamentosModule,
     UsuariosModule,

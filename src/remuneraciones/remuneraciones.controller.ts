@@ -55,15 +55,19 @@ import {
     @Post()
     async create(@Body() data: Partial<Remuneracion>): Promise<Remuneracion> {
       try {
-        // Validación de campos obligatorios
-        if (!data.monto_bruto || !data.fecha_pago || !data.usuario?.id) {
+        console.log("Datos recibidos en el backend:", data);
+    
+        if (!data.monto_bruto || !data.usuario?.id) {
           throw new HttpException(
-            'Los campos monto_bruto, fecha_pago y usuario.id son obligatorios',
+            'Los campos monto_bruto y usuario.id son obligatorios',
             HttpStatus.BAD_REQUEST,
           );
         }
-  
-        // Llamada al servicio para crear la remuneración
+    
+        if (!data.fecha_pago) {
+          data.fecha_pago = new Date(); // Asigna la fecha actual si no se envía
+        }
+    
         return await this.remuneracionesService.create(data);
       } catch (error) {
         console.error('Error al crear la remuneración:', error);

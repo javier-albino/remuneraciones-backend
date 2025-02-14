@@ -43,8 +43,12 @@ let RemuneracionesController = class RemuneracionesController {
     }
     async create(data) {
         try {
-            if (!data.monto_bruto || !data.fecha_pago || !data.usuario?.id) {
-                throw new common_1.HttpException('Los campos monto_bruto, fecha_pago y usuario.id son obligatorios', common_1.HttpStatus.BAD_REQUEST);
+            console.log("Datos recibidos en el backend:", data);
+            if (!data.monto_bruto || !data.usuario?.id) {
+                throw new common_1.HttpException('Los campos monto_bruto y usuario.id son obligatorios', common_1.HttpStatus.BAD_REQUEST);
+            }
+            if (!data.fecha_pago) {
+                data.fecha_pago = new Date();
             }
             return await this.remuneracionesService.create(data);
         }

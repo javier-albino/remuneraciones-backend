@@ -1,13 +1,5 @@
 import {
-    Controller,
-    Get,
-    Post,
-    Delete,
-    Body,
-    Param,
-    ParseIntPipe,
-    HttpException,
-    HttpStatus,
+    Controller,Get,Post,Delete,Body,Param,ParseIntPipe,HttpException,HttpStatus,
   } from '@nestjs/common';
   import { RemuneracionesService } from './remuneraciones.service';
   import { Remuneracion } from '../entities/remuneraciones';

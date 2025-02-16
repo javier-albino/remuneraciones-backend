@@ -14,6 +14,14 @@ export class UsuariosService {
     return this.usuariosRepository.find({ relations: ['rol', 'departamento'] });
   }
 
+  async findByEmail(correo: string): Promise<Usuario | null> {
+    return this.usuariosRepository.findOne({
+      where: { correo },
+      select: ['id', 'correo', 'password'], // 🔒 Incluir password en la consulta
+      relations: ['rol', 'departamento'],
+    });
+  }
+
   create(usuario: Partial<Usuario>): Promise<Usuario> {
     return this.usuariosRepository.save(usuario);
   }

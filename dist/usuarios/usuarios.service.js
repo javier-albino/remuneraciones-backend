@@ -24,6 +24,13 @@ let UsuariosService = class UsuariosService {
     findAll() {
         return this.usuariosRepository.find({ relations: ['rol', 'departamento'] });
     }
+    async findByEmail(correo) {
+        return this.usuariosRepository.findOne({
+            where: { correo },
+            select: ['id', 'correo', 'password'],
+            relations: ['rol', 'departamento'],
+        });
+    }
     create(usuario) {
         return this.usuariosRepository.save(usuario);
     }

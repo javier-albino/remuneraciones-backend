@@ -20,6 +20,9 @@ export class Usuario {
   @Column()
   fecha_contratacion: Date;
 
+  @Column({ select: false }) // 🔒 No se incluirá en consultas por defecto
+  password: string;
+
   // Relación con la tabla Roles
   @ManyToOne(() => Role, { eager: true }) // Relación muchos-a-uno con carga automática
   @JoinColumn({ name: 'rol_id' }) // Define la clave foránea

@@ -38,6 +38,10 @@ __decorate([
     __metadata("design:type", Date)
 ], Usuario.prototype, "fecha_contratacion", void 0);
 __decorate([
+    (0, typeorm_1.Column)({ select: false }),
+    __metadata("design:type", String)
+], Usuario.prototype, "password", void 0);
+__decorate([
     (0, typeorm_1.ManyToOne)(() => roles_1.Role, { eager: true }),
     (0, typeorm_1.JoinColumn)({ name: 'rol_id' }),
     __metadata("design:type", roles_1.Role)

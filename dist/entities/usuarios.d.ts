@@ -7,6 +7,7 @@ export declare class Usuario {
     correo: string;
     telefono: string;
     fecha_contratacion: Date;
+    password: string;
     rol: Role;
     departamento: Departamento;
     remuneraciones: Remuneracion[];

@@ -14,6 +14,7 @@ const departamentos_module_1 = require("./departamentos/departamentos.module");
 const usuarios_module_1 = require("./usuarios/usuarios.module");
 const remuneraciones_module_1 = require("./remuneraciones/remuneraciones.module");
 const config_1 = require("@nestjs/config");
+const auth_module_1 = require("./auth/auth.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -31,6 +32,7 @@ exports.AppModule = AppModule = __decorate([
             departamentos_module_1.DepartamentosModule,
             usuarios_module_1.UsuariosModule,
             remuneraciones_module_1.RemuneracionesModule,
+            auth_module_1.AuthModule,
         ],
     })
 ], AppModule);

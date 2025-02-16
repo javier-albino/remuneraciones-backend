@@ -5,6 +5,7 @@ import { DepartamentosModule } from './departamentos/departamentos.module';
 import { UsuariosModule } from './usuarios/usuarios.module';
 import { RemuneracionesModule } from './remuneraciones/remuneraciones.module';
 import { ConfigModule } from '@nestjs/config';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -19,7 +20,8 @@ import { ConfigModule } from '@nestjs/config';
     RolesModule,
     DepartamentosModule,
     UsuariosModule,
-    RemuneracionesModule, // Importa el módulo de roles
+    RemuneracionesModule,
+    AuthModule, // Importa el módulo de roles
   ],
 })
 export class AppModule {}

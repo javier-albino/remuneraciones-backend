@@ -6,6 +6,6 @@ export declare class AuthController {
         email: string;
         password: string;
     }): Promise<{
-        access_token: string;
+        token: string;
     }>;
 }

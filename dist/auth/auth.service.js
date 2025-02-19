@@ -19,18 +19,26 @@ let AuthService = class AuthService {
         this.usuariosService = usuariosService;
         this.jwtService = jwtService;
     }
-    async validateUser(email, password) {
-        const user = await this.usuariosService.findByEmail(email);
-        if (user && await bcrypt.compare(password, user.password)) {
-            const { password, ...result } = user;
-            return result;
+    async validateUser(correo, password) {
+        console.log('🔍 Buscando usuario con correo:', correo);
+        const user = await this.usuariosService.findByEmail(correo);
+        if (!user) {
+            console.error('⚠ Usuario no encontrado');
+            throw new common_1.UnauthorizedException('Correo o contraseña incorrectos');
         }
-        throw new common_1.UnauthorizedException('Credenciales inválidas');
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if (!isPasswordValid) {
+            console.error('⚠ Contraseña incorrecta');
+            throw new common_1.UnauthorizedException('Correo o contraseña incorrectos');
+        }
+        console.log('✅ Usuario autenticado:', user.correo);
+        const { password: _, ...userWithoutPassword } = user;
+        return userWithoutPassword;
     }
     async login(user) {
-        const payload = { sub: user.id, email: user.email };
+        const payload = { sub: user.id, correo: user.correo };
         return {
-            access_token: this.jwtService.sign(payload),
+            token: this.jwtService.sign(payload),
         };
     }
 };

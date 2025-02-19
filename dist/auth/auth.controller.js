@@ -21,6 +21,9 @@ let AuthController = class AuthController {
     }
     async login(body) {
         const user = await this.authService.validateUser(body.email, body.password);
+        if (!user) {
+            throw new common_1.UnauthorizedException('Correo o contraseña incorrectos');
+        }
         return this.authService.login(user);
     }
 };

@@ -1,22 +1,28 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import * as fs from 'fs';
+import * as https from 'https';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const httpsOptions = {
+    key: fs.readFileSync('./ssl/server.key'),
+    cert: fs.readFileSync('./ssl/server.cert'),
+  };
 
-  // 🔹 Definir los orígenes permitidos (desarrollo y producción)
-  const allowedOrigins = [
-    'http://localhost:5173', // Desarrollo
-    'https://publicar-aws.d3jgg0pv126bjm.amplifyapp.com', // Producción en AWS Amplify
-  ];
-
-  app.enableCors({
-    origin: allowedOrigins, // Permite varias URLs
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    credentials: true, // Si usas cookies o JWT con credenciales
+  const app = await NestFactory.create(AppModule, {
+    httpsOptions,
   });
 
-  await app.listen(3000, '0.0.0.0');
+  app.enableCors({
+    origin: [
+      'http://localhost:5173', // Desarrollo
+      'https://publicar-aws.d3jgg0pv126bjm.amplifyapp.com', // Producción
+    ],
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
+  });
+
+  await app.listen(3000);
 }
 
 bootstrap();
